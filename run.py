@@ -130,14 +130,14 @@ mech_list: PLAIN
       logging.info("Creating SASL account for %s@%s" % (account['name'], domain))
       cmd = ['saslpasswd2', '-p', '-c', '-u', domain, account['name']]
       p = Popen(cmd, stdin=PIPE)
-      p.communicate(input=account['password'])
+      p.communicate(input=str.encode(account['password']))
       retcode = p.poll()
       if retcode:
         raise CalledProcessError(retcode, cmd)
 
 def get_forward_list(account):
   forward = account['forward']
-  if isinstance(forward, basestring):
+  if isinstance(forward, str):
     forward = [forward]
   return forward
 
@@ -199,17 +199,8 @@ def spawn_postsrsd():
   Popen(cmd)
 
 def spawn_postfix():
-  # Start up the postfix master in the foreground.  Normally this happens with:
-  #   /etc/init.d/postfix start ->
-  #   /usr/sbin/postfix ->
-  #   /usr/lib/postfix/postfix-script ->
-  #   /usr/lib/postfix/master
-  #
-  # The only thing I can figure that *really* matters here is that we change the
-  # working directory to the spool directory.  I might be missing some env
-  # variables :/
   os.chdir('/var/spool/postfix')
-  cmd = ['/usr/lib/postfix/master', '-d']
+  cmd = ['/usr/lib/postfix/sbin/master', '-d']
   logging.info("Running postfix master: %s", repr(cmd))
   Popen(cmd)
 

@@ -12,12 +12,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-FROM buildpack-deps:wheezy-scm
-MAINTAINER Joe Beda
+FROM ubuntu:20.04
+MAINTAINER James Phillips
 
-RUN echo "deb http://http.debian.net/debian wheezy-backports main" >>/etc/apt/sources.list
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/London
+RUN debconf-set-selections <<< "postfix postfix/main_mailer_type string 'No configuration'"
+RUN debconf-set-selections <<< "postfix postfix/mailname string ''"
+
 RUN apt-get update \
-  && apt-get -t wheezy-backports install -y --no-install-recommends \
+  && apt-get install -y --no-install-recommends \
     sasl2-bin \
     libsasl2-modules \
     postfix \
@@ -25,11 +31,13 @@ RUN apt-get update \
     opendkim-tools \
     rsyslog \
     cmake \
+    curl \
     build-essential \
-    python-pip \
+    python-is-python3 \
+    python3-pip \
   && rm -rf /var/lib/apt/lists/*
 
-RUN pip install pyyaml
+RUN pip3 install pyyaml
 
 WORKDIR /opt
 

@@ -13,12 +13,12 @@
 #    limitations under the License.
 
 FROM postfix-forwarder-base
-MAINTAINER Joe Beda
+MAINTAINER James Phillips
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     less \
     man \
-    emacs23-nox \
+    vim \
     procps
 
 ENV TERM=xterm
