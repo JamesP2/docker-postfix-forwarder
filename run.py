@@ -20,6 +20,8 @@ import io
 import logging
 import os
 import os.path
+import sys
+from pathlib import Path
 
 CONFIG_FILE = '/opt/config.yaml'
 SYSLOG_FIFO = '/var/log/syslog-fifo'
@@ -27,6 +29,9 @@ SYSLOG_FIFO = '/var/log/syslog-fifo'
 
 def main():
     global config
+    global start_services 
+    
+    start_services = not (len(sys.argv) > 1 and sys.argv[1] == '--nostart')
 
     logging.getLogger().setLevel(logging.INFO)
     logging.info('Reading config: %s' % CONFIG_FILE)
@@ -38,11 +43,14 @@ def main():
     configure_postscreen()
     configure_sasl()
     configure_virtual_domains()
+    configure_opendkim()
+    spawn_opendkim()
     spawn_postsrsd()
     spawn_postfix()
 
     # Wait for something to exit.  As soon as some child process exits we exit
-    os.wait()
+    if start_services:
+        os.wait()
 
 
 def spawn_rsyslogd():
@@ -203,6 +211,59 @@ def configure_virtual_domains():
     check_call(['postmap', ai_fn])
 
 
+def configure_opendkim():
+    if not config['dkim']['enable']:
+        return
+
+    logging.info('Configuring OpenDKIM')
+
+    with open('/etc/opendkim.conf', 'a+') as f:
+        lines = [
+            'KeyTable refile:/etc/opendkimKeyTable\n',
+            'SigningTable refile:/etc/opendkimSigningTable\n',
+            'ExternalIgnoreList refile:/etc/opendkimTrustedHosts\n',
+            'InternalHosts refile:/etc/opendkimTrustedHosts\n'
+        ]
+        f.writelines(lines)
+
+    with open('/etc/opendkimTrustedHosts', 'w') as f:
+        f.write('127.0.0.1')
+
+    with open('/etc/opendkimKeyTable', 'w') as key_table, open('/etc/opendkimSigningTable', 'w') as signing_table:
+        for (domain, domain_info) in config['virtual_domains'].items():
+            # If there's no DKIM configuration for this domain skip it
+            if not 'dkim' in domain_info:
+                continue
+
+            logging.info('Adding DKIM Key information for %s', domain)
+
+            key_line = domain_info['dkim']['selector'] + \
+                '._domainkey.' + domain + ' ' + \
+                domain + ':' + domain_info['dkim']['selector'] + \
+                ':/opt/' + domain_info['dkim']['key']
+
+            key_table.write(key_line + '\n')
+
+            signing_line = '*@' + domain + ' ' + \
+                domain_info['dkim']['selector'] + '._domainkey.' + domain
+
+            signing_table.write(signing_line + '\n')
+
+    logging.info('Finished configuring OpenDKIM')
+
+
+def spawn_opendkim():
+    if not config['dkim']['enable']:
+        return
+
+    check_call(
+        ['postconf', '-e', 'smtpd_milters=unix:/run/opendkim/opendkim.sock'])
+    check_call(['postconf', '-e', 'non_smtpd_milters=$smtpd_milters'])
+
+    if start_services:
+        Popen('/usr/sbin/opendkim')
+
+
 def spawn_postsrsd():
     if not config['srs']['enable']:
         return
@@ -219,18 +280,20 @@ def spawn_postsrsd():
 
     exclude_domains = ",".join(config['virtual_domains'].keys())
 
-    cmd = ['postsrsd-1.2/build/postsrsd', '-s/opt/srs.secret', '-upostfix',
-           '-d%s' % config['srs']['srs_domain'],
-           '-X%s' % exclude_domains]
-    logging.info("Running postsrsd: %s", repr(cmd))
-    Popen(cmd)
+    if start_services:
+        cmd = ['postsrsd-1.2/build/postsrsd', '-s/opt/srs.secret', '-upostfix',
+               '-d%s' % config['srs']['srs_domain'],
+               '-X%s' % exclude_domains]
+        logging.info("Running postsrsd: %s", repr(cmd))
+        Popen(cmd)
 
 
 def spawn_postfix():
-    os.chdir('/var/spool/postfix')
-    cmd = ['/usr/lib/postfix/sbin/master', '-d']
-    logging.info("Running postfix master: %s", repr(cmd))
-    Popen(cmd)
+    if start_services:
+        os.chdir('/var/spool/postfix')
+        cmd = ['/usr/lib/postfix/sbin/master', '-d']
+        logging.info("Running postfix master: %s", repr(cmd))
+        Popen(cmd)
 
 
 if __name__ == "__main__":

@@ -47,6 +47,16 @@ Basically, there are two types of checks:
 
 **Post-220 checks:** There are further checks that look for deeper protocol violations.  The problem here is that postscreen isn't a proxy.  So if it determines that a sending agent is legit, it can't hand off to postfix at this point. Instead, it tells the sending agent to retry later.  On the next try, the connection will be handed off to postfix immediately.  However, well behaved agents may wait minutes before retrying.
 
+### OpenDKIM
+
+Generate keys using the following command on a system with opendkim installed (alternatively `make bash` and use a container to do it):
+
+`opendkim-genkey -D ./ -d example.com -s mail`
+
+The above generates a domain key in the current directory for domain "example.com" and the selector "mail".
+
+Put your DKIM Keys in the keys/ directory and specify your keys for each domain in the configuration file.
+
 ## Build/upload
 
 If you are using the Google Cloud Registry, simply run `make upload-gcr`.  This will build and upload the Docker image to a private registry.
@@ -104,13 +114,6 @@ If you are running logrotate on the host system, you truncate/rotate logs by dro
 ```
 
 No guarantees here as this is a bit of a hack.  This is a big hole in Docker right now.  If things are logging fast, the `copytruncate` directive may miss some log lines.
-
-## TODOs
-
-* [ ] Integrate SpamAssasin
-* [x] Support multiple email forward targets
-* [ ] Figure out DKIM
-* [ ] More flexibilty in rewriting/aliases
 
 ## References
 

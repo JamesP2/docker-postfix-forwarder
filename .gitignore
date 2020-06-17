@@ -1,2 +1,4 @@
 config.yaml
 .vscode/
+keys/*
+!keys/README.md
