@@ -217,6 +217,8 @@ def configure_opendkim():
 
     logging.info('Configuring OpenDKIM')
 
+    check_call(['adduser', 'postfix', 'opendkim'])
+
     with open('/etc/opendkim.conf', 'a+') as f:
         lines = [
             'KeyTable refile:/etc/opendkimKeyTable\n',
