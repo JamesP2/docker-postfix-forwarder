@@ -26,7 +26,7 @@ image: base-image Dockerfile.prod base-image
 
 bash: base-image Dockerfile.bash
 	docker build -f Dockerfile.bash -t $(image-name)-bash .
-	docker run -ti --rm $(image-name)-bash bash
+	docker run --name postfix-forwarder-bash -ti --rm $(image-name)-bash bash 
 
 BUCKET := $(shell gcloud config -q --format text list project | cut -d ' ' -f 2 | tr - _)
 GCR_NAME := gcr.io/$(BUCKET)/$(image-name)
