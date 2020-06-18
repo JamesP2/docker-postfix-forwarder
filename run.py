@@ -139,6 +139,8 @@ def configure_postscreen():
 def configure_sasl():
     check_call(['postconf', '-e', 'smtpd_sasl_type = cyrus'])
     check_call(['postconf', '-e', 'smtpd_sasl_auth_enable = yes'])
+    check_call(['postconf', '-e', 'smtpd_tls_auth_only = no'])
+    check_call(['postconf', '-e', 'smtp_sasl_security_options = noanonymous'])
     check_call(['postconf', '-e', 'broken_sasl_auth_clients = yes'])
     check_call(['adduser', 'postfix', 'sasl'])
     with open('/etc/postfix/sasl/smtpd.conf', 'w') as f:
