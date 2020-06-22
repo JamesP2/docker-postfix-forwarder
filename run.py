@@ -52,6 +52,8 @@ def main():
     if start_services:
         os.wait()
 
+    logging.info('Exited')
+
 
 def spawn_rsyslogd():
     logging.info('Starting rsyslogd')
@@ -297,7 +299,9 @@ def spawn_postfix():
         os.chdir('/var/spool/postfix')
         cmd = ['/usr/lib/postfix/sbin/master', '-d']
         logging.info("Running postfix master: %s", repr(cmd))
-        Popen(cmd)
+        process = Popen(cmd)
+        logging.info('Waiting for process')
+        process.wait()
 
 
 if __name__ == "__main__":
