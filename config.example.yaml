@@ -31,7 +31,7 @@ ptr_hostname: somerandom.domain.from.provider
 # apple and  redfin as they all have '-all' at the end of their SPF policies.
 # I'm sure there are others.
 srs:
-  enable: True
+  enable: False
 
   # This is the domain that is used for SRS. All forwarded mail will be
   # rewritten to be coming from this domain.  You'll probably want an SPF record
@@ -46,7 +46,7 @@ srs:
 # Postscreen sits in front of postfix and looks for suspicious implementations
 # that are sending mail.  It also checks a couple of common black lists.
 postscreen:
-  enable: True
+  enable: False
 
   # More in depth checks from postscreen are implemented via a mechanism where
   # it must return a "temporarily unavailable" message to senders.  For
@@ -54,9 +54,14 @@ postscreen:
   # delivery dramatically.
   enable_slow_checks: False
 
+# If you are enabling DKIM you must also specify your DKIM selector and key
+# for each domain (see below)
+dkim:
+  enable: True
+
 # This is the set of virtual domains.
 virtual_domains:
-  example.com:
+  jamesphillips.me.uk:
     accounts:
       # Each account has the following properties:
       # * name: The name that this MTA will send mail as.  This is translated to
@@ -82,7 +87,8 @@ virtual_domains:
         forward:
           - bob1@gmail.com
           - bob2@gmail.com
-    blackholes:
-      # Each entry in this list will be explicitly dropped.  This will be
-      # applied before any other mappings/rewrites
-      - alice.spammy
+    dkim:
+      # Location of the DKIM key for this domain
+      # See README.md for help generating a key.
+      key: keys/mydomain.com/mail.private
+      selector: mail
