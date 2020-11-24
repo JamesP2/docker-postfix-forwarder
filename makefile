@@ -40,3 +40,6 @@ upload-gcr-test: image
 	docker tag -f $(image-name) $(GCR_NAME):test
 	gcloud docker push $(GCR_NAME):test
 	docker rmi $(GCR_NAME):test
+
+run-latest:
+	docker run --name postfix   -v /opt/postfix-forwarder:/var/spool/postfix   -p 587:587 -p 25:25   -d postfix-forwarder

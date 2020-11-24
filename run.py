@@ -255,6 +255,8 @@ def configure_opendkim():
 
             signing_table.write(signing_line + '\n')
 
+            check_call(['chown', 'opendkim:opendkim', domain_info['dkim']['key']])
+
     logging.info('Finished configuring OpenDKIM')
 
 
