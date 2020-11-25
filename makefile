@@ -42,4 +42,7 @@ upload-gcr-test: image
 	docker rmi $(GCR_NAME):test
 
 run-latest:
-	docker run --name postfix   -v /opt/postfix-forwarder:/var/spool/postfix   -p 587:587 -p 25:25   -d postfix-forwarder
+	docker run --name postfix --restart unless-stopped -v /opt/postfix-forwarder:/var/spool/postfix -p 587:587 -p 25:25 -d postfix-forwarder
+
+run-latest-syslog:
+	docker run --name postfix --restart unless-stopped --log-driver syslog -v /opt/postfix-forwarder:/var/spool/postfix -p 587:587 -p 25:25 -d postfix-forwarder
