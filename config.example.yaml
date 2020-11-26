@@ -61,7 +61,7 @@ dkim:
 
 # This is the set of virtual domains.
 virtual_domains:
-  jamesphillips.me.uk:
+  example.com:
     accounts:
       # Each account has the following properties:
       # * name: The name that this MTA will send mail as.  This is translated to
@@ -92,3 +92,5 @@ virtual_domains:
       # See README.md for help generating a key.
       key: keys/mydomain.com/mail.private
       selector: mail
+  # You can also specify domains in separate YAML files
+  example.org: !include domains/example.yaml

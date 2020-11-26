@@ -1,0 +1,12 @@
+# example.org
+# declared as a separate file
+accounts:
+  - name: andrew
+    password: 123456
+    forward: andy@gmail.com
+    dot_plus_rewrite: false
+    aliases:
+      - andy
+dkim:
+  key: keys/example.org/mail.private
+  selector: mail

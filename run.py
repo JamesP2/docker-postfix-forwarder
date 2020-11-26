@@ -16,6 +16,7 @@
 
 from subprocess import *
 import yaml
+from yamlinclude import YamlIncludeConstructor
 import io
 import logging
 import os
@@ -26,11 +27,14 @@ from pathlib import Path
 CONFIG_FILE = '/opt/config.yaml'
 SYSLOG_FIFO = '/var/log/syslog-fifo'
 
+YamlIncludeConstructor.add_to_loader_class(
+    loader_class=yaml.FullLoader, base_dir='/opt')
+
 
 def main():
     global config
-    global start_services 
-    
+    global start_services
+
     start_services = not (len(sys.argv) > 1 and sys.argv[1] == '--nostart')
 
     logging.getLogger().setLevel(logging.INFO)
@@ -255,7 +259,8 @@ def configure_opendkim():
 
             signing_table.write(signing_line + '\n')
 
-            check_call(['chown', 'opendkim:opendkim', domain_info['dkim']['key']])
+            check_call(['chown', 'opendkim:opendkim',
+                        domain_info['dkim']['key']])
 
     logging.info('Finished configuring OpenDKIM')
 

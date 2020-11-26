@@ -2,3 +2,5 @@ config.yaml
 .vscode/
 keys/*
 !keys/README.md
+domains/*
+!domains/example.yaml
