@@ -261,6 +261,7 @@ def configure_opendkim():
 
             check_call(['chown', 'opendkim:opendkim',
                         domain_info['dkim']['key']])
+            check_call(['chmod', '600', domain_info['dkim']['key']])
 
     logging.info('Finished configuring OpenDKIM')
 
