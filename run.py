@@ -227,12 +227,15 @@ def configure_opendkim():
 
     check_call(['adduser', 'postfix', 'opendkim'])
 
+    check_call(['chown', '-R', 'opendkim:opendkim', '/opt/keys'])
+
     with open('/etc/opendkim.conf', 'a+') as f:
         lines = [
             'KeyTable refile:/etc/opendkimKeyTable\n',
             'SigningTable refile:/etc/opendkimSigningTable\n',
             'ExternalIgnoreList refile:/etc/opendkimTrustedHosts\n',
-            'InternalHosts refile:/etc/opendkimTrustedHosts\n'
+            'InternalHosts refile:/etc/opendkimTrustedHosts\n',
+            'RequireSafeKeys false'
         ]
         f.writelines(lines)
 
@@ -261,7 +264,7 @@ def configure_opendkim():
 
             check_call(['chown', 'opendkim:opendkim',
                         domain_info['dkim']['key']])
-            check_call(['chmod', '600', domain_info['dkim']['key']])
+            check_call(['chmod', '660', domain_info['dkim']['key']])
 
     logging.info('Finished configuring OpenDKIM')
 
