@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 FROM ubuntu:20.04
-MAINTAINER James Phillips
+LABEL maintainer="James Phillips"
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 

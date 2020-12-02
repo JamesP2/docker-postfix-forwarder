@@ -23,7 +23,7 @@ srs.example.com | TXT | "v=spf1 mx ~all"
 
 ## Config file
 
-Copy `config.example.yaml` to `config.yaml` and edit as appropriate.  There are comments on each value.
+Copy `config/config.example.yaml` to `config/config.yaml` and edit as appropriate.  There are comments on each value.
 
 ### SRS
 
@@ -55,7 +55,7 @@ Generate keys using the following command on a system with opendkim installed (a
 
 The above generates a domain key in the current directory for domain "example.com" and the selector "mail".
 
-Put your DKIM Keys in the keys/ directory and specify your keys for each domain in the configuration file.
+Put your DKIM Keys in the config/keys/ directory and specify your keys for each domain in the configuration file.
 
 ## Build/upload
 

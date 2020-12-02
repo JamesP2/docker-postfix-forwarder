@@ -24,11 +24,11 @@ import os.path
 import sys
 from pathlib import Path
 
-CONFIG_FILE = '/opt/config.yaml'
+CONFIG_FILE = '/opt/config/config.yaml'
 SYSLOG_FIFO = '/var/log/syslog-fifo'
 
 YamlIncludeConstructor.add_to_loader_class(
-    loader_class=yaml.FullLoader, base_dir='/opt')
+    loader_class=yaml.FullLoader, base_dir='/opt/config')
 
 
 def main():
@@ -227,7 +227,7 @@ def configure_opendkim():
 
     check_call(['adduser', 'postfix', 'opendkim'])
 
-    check_call(['chown', '-R', 'opendkim:opendkim', '/opt/keys'])
+    check_call(['chown', '-R', 'opendkim:opendkim', '/opt/config/keys'])
 
     with open('/etc/opendkim.conf', 'a+') as f:
         lines = [
@@ -253,7 +253,7 @@ def configure_opendkim():
             key_line = domain_info['dkim']['selector'] + \
                 '._domainkey.' + domain + ' ' + \
                 domain + ':' + domain_info['dkim']['selector'] + \
-                ':/opt/' + domain_info['dkim']['key']
+                ':/opt/config/' + domain_info['dkim']['key']
 
             key_table.write(key_line + '\n')
 
@@ -263,8 +263,8 @@ def configure_opendkim():
             signing_table.write(signing_line + '\n')
 
             check_call(['chown', 'opendkim:opendkim',
-                        domain_info['dkim']['key']])
-            check_call(['chmod', '660', domain_info['dkim']['key']])
+                        '/opt/config/' + domain_info['dkim']['key']])
+            check_call(['chmod', '660', '/opt/config/' + domain_info['dkim']['key']])
 
     logging.info('Finished configuring OpenDKIM')
 

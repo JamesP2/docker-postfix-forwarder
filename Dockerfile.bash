@@ -13,7 +13,7 @@
 #    limitations under the License.
 
 FROM postfix-forwarder-base
-MAINTAINER James Phillips
+LABEL maintainer="James Phillips"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     less \

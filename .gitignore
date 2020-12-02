@@ -1,6 +1,6 @@
-config.yaml
+config/config.yaml
 .vscode/
-keys/*
-!keys/README.md
-domains/*
-!domains/example.yaml
+config/keys/*
+!config/keys/README.md
+config/domains/*
+!config/domains/example.yaml
