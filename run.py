@@ -212,7 +212,7 @@ def configure_virtual_domains():
     with open("/etc/postfix/virtual.regexp", "w") as f:
         for (domain, domain_info) in config["virtual_domains"].items():
             for account in domain_info["accounts"]:
-                if account.get("dot_plus_rewrite", True):
+                if account.get("dot_plus_rewrite", False):
                     name = account["name"]
                     forwards = " ".join(
                         [

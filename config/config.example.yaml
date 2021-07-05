@@ -72,7 +72,7 @@ virtual_domains:
       # * single email address or a list of email addresses.
       # * dot_plus_rewrite: Rewrite 'user.extra@domain.com' to
       #   'forward_user+extra@forward_domain.com' for the main name.  Optional,
-      #   defaults to true.
+      #   defaults to false.
       # * aliases: A list of other email addresses that will forward to the same
       #   place. There is no provision for sending mail *as* these addresses.
       #   Create a new account if you need that. Optional.
