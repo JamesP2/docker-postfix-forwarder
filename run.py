@@ -168,13 +168,20 @@ mech_list: PLAIN
 
     for (domain, domain_info) in config["virtual_domains"].items():
         for account in domain_info["accounts"]:
-            logging.info("Creating SASL account for %s@%s" % (account["name"], domain))
-            cmd = ["saslpasswd2", "-p", "-c", "-u", domain, account["name"]]
-            p = Popen(cmd, stdin=PIPE)
-            p.communicate(input=str.encode(account["password"]))
-            retcode = p.poll()
-            if retcode:
-                raise CalledProcessError(retcode, cmd)
+            if "password" in account:
+                logging.info(
+                    "Creating SASL account for %s@%s" % (account["name"], domain)
+                )
+                cmd = ["saslpasswd2", "-p", "-c", "-u", domain, account["name"]]
+                p = Popen(cmd, stdin=PIPE)
+                p.communicate(input=str.encode(account["password"]))
+                retcode = p.poll()
+                if retcode:
+                    raise CalledProcessError(retcode, cmd)
+            else:
+                logging.info(
+                    f'Not creating account for mailbox {account["name"]}@{domain}'
+                )
 
 
 def get_forward_list(account):
@@ -201,7 +208,7 @@ def configure_virtual_domains():
                 def forward(alias):
                     forward = " ".join(get_forward_list(account))
                     logging.info("Forwarding %s@%s to %s" % (alias, domain, forward))
-                    f.write("%s@%s %s\n" % (alias, domain, account["forward"]))
+                    f.write("%s@%s %s\n" % (alias, domain, forward))
 
                 forward(account["name"])
                 for alias in account.get("aliases", []):
